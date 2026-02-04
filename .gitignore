@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Bittensor specific
+~/.bittensor/
+wallets/
+*.json
+*.seed
+
+# OS
+.DS_Store
+Thumbs.db
