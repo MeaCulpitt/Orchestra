@@ -32,11 +32,11 @@ For detailed insights into the specific logic, incentives, and growth strategies
 
 | Section | Description |
 | :--- | :--- |
-| **[Incentive Mechanism](./Incentive_Mechanism.md)** | The mathematical scoring (OES) and dTAO reward distribution logic. |
-| **[Miner Design](./Miner_Design.md)** | Architectural requirements and expectations for the "Strategic Dispatcher" role. |
-| **[Validator Design](./Validator_Design.md)** | Audit protocols, logic-trap injection, and V-Trust scoring methodology. |
-| **[Market Rationale](./Market_Rationale.md)** | The business case for orchestration and its role in the 2026 AI economy. |
-| **[Go-To-Market Strategy](./GTM_Strategy.md)** | The roadmap for developer adoption and internal network growth. |
+| **[Incentive Mechanism](./docs/Incentive_Mechanism.md)** | The mathematical scoring (OES) and dTAO reward distribution logic. |
+| **[Miner Design](./docs/Miner_Design.md)** | Architectural requirements and expectations for the "Strategic Dispatcher" role. |
+| **[Validator Design](./docs/Validator_Design.md)** | Audit protocols, logic-trap injection, and V-Trust scoring methodology. |
+| **[Market Rationale](./docs/Market_Rationale.md)** | The business case for orchestration and its role in the 2026 AI economy. |
+| **[Go-To-Market Strategy](./docs/GTM_Strategy.md)** | The roadmap for developer adoption and internal network growth. |
 
 ---
 
