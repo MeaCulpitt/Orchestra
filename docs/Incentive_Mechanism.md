@@ -1,17 +1,20 @@
-## 1. Incentive & Mechanism Design
+## ⚙️ Incentive & Mechanism Design
 
-The goal is to incentivize **Orchestration Intelligence**—the ability to decompose a single user intent into a multi-subnet execution plan.
+The Orchestra subnet utilizes a market-driven incentive model built on the **Yuma Consensus** and **Dynamic TAO (dTAO)**. Our goal is to reward miners who demonstrate superior "Orchestration Intelligence."
 
-### Reward Logic
-Rewards are split via the standard **41/41/18** model (Miners/Validators/Owners). Emissions are calculated based on the **Orchestration Efficiency Score (OES)**.
-
-### The OES Formula
+### The OES Formula (Orchestration Efficiency Score)
+To ensure the subnet provides high utility, we calculate rewards using three core vectors:
 $$OES = (W_{s} \cdot Speed) + (W_{a} \cdot Accuracy) + (W_{e} \cdot Efficiency)$$
 
-* **$W_{s}$ (Speed):** Total round-trip time from prompt to final synthesis.
-* **$W_{a}$ (Accuracy):** Validator assessment of the final output quality.
-* **$W_{e}$ (Efficiency):** Minimizing redundant calls to subnets (rewarding "clean" logic).
+* **Speed ($W_{s}$):** Measures the round-trip latency. In an agentic economy, speed is the difference between a tool being useful or obsolete.
+* **Accuracy ($W_{a}$):** Validated via a Consensus Judge LLM that compares the miner's final output against a reference standard.
+* **Efficiency ($W_{e}$):** Miners are penalized for redundant API calls. We reward "clean" logic that solves tasks using the minimum necessary expert nodes.
+
+### dTAO Economic Flywheel
+Under the dTAO 2026 upgrade, SN-Orchestra functions as an independent Automated Market Maker (AMM). 
+* **Alpha Token ($\alpha$):** Emissions are paid in the subnet's native token.
+* **Staking Signals:** As demand for orchestration grows, stakers swap TAO for Orchestra Alpha, increasing the subnet's emission share from the global 1 TAO/block pool.
 
 ### Adversarial Discouragement
-* **Pipeline Verification:** Miners must submit a `task_pipeline` log. If a miner claims to have used an external subnet but cannot provide the signed response hash from that subnet’s validator, their score for that epoch is zeroed.
-* **Synthetic Trap Tasks:** Validators inject "known-answer" complex tasks. If a miner hallucinates or bypasses the sub-steps, they face immediate rank pruning.
+* **Signed Receipts:** Miners must submit cryptographically signed hashes from the validators of the subnets they utilized (e.g., a signature from an SN62 validator).
+* **Pruning:** Low-performing miners are automatically deregistered once the 256 UID slots are filled, ensuring a constant "survival of the fittest."
