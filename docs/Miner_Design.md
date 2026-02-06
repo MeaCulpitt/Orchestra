@@ -1,60 +1,53 @@
-# 🎻 Orchestra Miner Design
+# 🎻 Orchestra Miner Design: The Lead Architect
 
-In the Orchestra subnet, Miners operate as **Lead Architects**. Unlike traditional subnets where miners perform a singular compute task, Orchestra Miners are evaluated on their ability to manage complex workflows and maintain a high-fidelity record of the Bittensor ecosystem.
-
----
-
-## 1. Miner Tasks
-A Miner’s operational cycle is divided into two continuous workstreams:
-
-### A. Managed Pipeline Execution (The Architect)
-When a request is received, the Miner must:
-* **Deconstruct the Objective:** Break down a high-level user prompt into a logical sequence of sub-tasks.
-* **Expert Procurement:** Query the internal Subnet Ledger to identify which subnets (e.g., SN5, SN19, SN22) possess the specific expertise required for the current roadmap.
-* **Inter-Subnet Routing:** Call the selected subnets, handle their specific authentication/synapse requirements, and collect raw intelligence.
-* **Synthesis & Mapping:** Aggregate the disparate data points and map them into the requested final schema.
-
-### B. Ledger Maintenance (The Bookkeeper)
-Independent of specific tasks, Miners must:
-* **Metagraph Polling:** Periodically "ping" and sample outputs from across the Bittensor network to detect changes in subnet behavior or data structures.
-* **Schema Validation:** Update local Pydantic models to ensure the Miner’s internal map of the ecosystem matches the live reality of other subnets.
-* **Optimization:** Track the performance (latency and quality) of other subnets to ensure future routing decisions are data-driven.
-
-
+In the Orchestra network, miners do not perform raw compute. They operate as **Lead Architects**—strategic managers who coordinate a global supply chain of decentralized intelligence to deliver finished project packages.
 
 ---
 
-## 2. Expected Input → Output Format
-Miners communicate via the `OrchestraSynapse`, which enforces a strict contract between the Validator's request and the Miner's delivery.
+## 1. Primary Tasks: The Project Lifecycle
+A miner’s primary responsibility is the successful execution of complex, multi-subnet objectives. This work is divided into three critical management phases:
+
+* **Task Decomposition:** Upon receiving a high-level objective, the miner must utilize a high-reasoning model to break the goal into a logical sequence of sub-tasks.
+* **Expert Procurement:** Using their internal Subnet Ledger, the miner identifies and programmatically "hires" the best-performing expert subnets (e.g., SN19 for data, SN103 for reasoning) to fulfill each stage of the roadmap.
+* **Synthesis & Delivery:** The miner aggregates the disparate outputs from these experts, performs a final quality audit, and packages the result into a single, high-value solution for the user.
+
+---
+
+## 2. Secondary Task: Ledger Maintenance (The Manager's Map)
+To lead effectively, an Architect must know their workforce. **Ledger Maintenance** is the essential background function that powers the management engine.
+
+* **Real-Time Polling:** Miners must continuously poll the metagraph to detect changes in subnet capabilities, latency, and reliability.
+* **Standardization (The Byproduct):** Miners maintain Pydantic-validated schemas for every subnet they manage. This ensures that when the Lead Architect delivers a project, the data is structured, type-safe, and deterministic—eliminating the "fragmentation tax" for the end user.
+
+
+---
+
+## 3. Expected Input → Output Format
+Miners communicate via the `OrchestraSynapse`, adhering to a strict professional contract:
 
 ### Expected Input (From Validator)
-* **`objective` (String):** A complex, multi-stage goal (e.g., "Research the latest decentralized AI trends and output a SWOT analysis in JSON").
-* **`target_schema` (JSON/Dict):** A Pydantic-compatible schema defining exactly how the Miner must structure the final response.
+* **`objective` (String):** A complex, multi-dimensional goal.
+* **`target_schema` (JSON/Dict):** The required structure for the final output.
 
 ### Expected Output (To Validator)
-* **`task_pipeline` (List[Dict]):** A transparent log of the expert subnets called, including the specific Synapse types used and the cryptographic hashes of the responses received.
-* **`standardized_data` (JSON/Dict):** The final synthesized result, strictly adhering to the `target_schema`.
-* **`final_synthesis` (String):** A human-readable executive summary of the project’s completion.
+* **`task_pipeline` (List[Dict]):** A detailed log of the experts hired, including cryptographic hash-proofs of their responses.
+* **`standardized_data` (JSON/Dict):** The final project results, formatted strictly to the target schema.
+* **`final_synthesis` (String):** A human-readable executive summary of the project’s outcome.
 
 ---
 
-## 3. Performance Dimensions
-Miner performance is graded across three primary vectors, which directly influence the weight ($W$) assigned by Validators.
+## 4. Performance Dimensions
+Miner weights are calculated based on their efficiency as managers and the accuracy of their internal records:
 
-### A. Quality of Synthesis (Weight: 40%)
-The synthesis is evaluated on its comprehensiveness. Validators check if the Miner successfully integrated all necessary components of the objective. A high-quality response isn't just a "summary"; it is an enriched data package that provides more value than the sum of its raw parts.
-
-### B. Ledger Accuracy (Weight: 30%)
-The Miner’s ability to correctly identify and use the right subnets is critical. If a Miner routes a coding task to a search subnet, or provides a data structure that breaks the `target_schema`, the Accuracy score is penalized. This ensures the **Subnet Ledger** remains a "Standard of Truth."
-
-
-
-### C. Speed & Efficiency (Weight: 30%)
-In a production environment, latency is a product killer. Miners are timed on their "Time to Synthesis." This includes the time taken to plan, call external subnets, and format the data. To score high here, Miners must implement efficient asynchronous calling and maintain a "hot" local cache of the Subnet Ledger.
+| Dimension | Weight | Metric |
+| :--- | :--- | :--- |
+| **Management Quality** | **70%** | The depth of decomposition and the utility of the final synthesis. |
+| **Record Integrity** | **30%** | The accuracy of the Subnet Ledger data against the live state of the experts. |
+| **Speed (Latency)** | **Multiplier** | Efficient miners with high-speed async pipelines receive a reward multiplier. |
 
 ---
 
-## 4. Operational Requirements
-* **Asynchronous Networking:** Miners must be capable of handling multiple concurrent requests and outgoing subnet calls without blocking.
-* **Pydantic Proficiency:** The ability to dynamically map unstructured data into strict schemas is the Miner's core technical advantage.
-* **Metagraph Awareness:** Miners must maintain an active `bt.metagraph` object to stay synchronized with the evolving state of the network.
+## 5. Technical Requirements
+* **Asynchronous Orchestration:** Miners must handle concurrent calls to multiple external subnets without blocking.
+* **Pydantic Registry:** Miners must maintain a local database of validated schemas for all supported subnets.
+* **Verification Logic:** Miners should perform internal audits of expert outputs before synthesis to ensure high-fidelity delivery to the Validator.
