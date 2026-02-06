@@ -1,0 +1,34 @@
+# ⚙️ Subnet Configuration: SN-Orchestra Dual Mechanism
+
+This configuration defines the split between "Strategic Routing" and "Data Standardization." By setting these hyperparameters, the subnet owner ensures that miners are incentivized to not only find the right experts but also to return perfectly structured data.
+
+---
+
+## 1. Emission Split Configuration
+Using the `sudo_set_mechanism_emission_split` operation, the subnet total emission (alpha_out) is divided between two internal mechanisms.
+
+```json
+{
+  "subnet_name": "Orchestra",
+  "netuid": 99,
+  "mechanisms": [
+    {
+      "id": 0,
+      "name": "Task_Routing_and_Synthesis",
+      "emission_split": 0.70,
+      "description": "Incentivizes the decomposition of prompts and cross-subnet procurement of expert results."
+    },
+    {
+      "id": 1,
+      "name": "JSON_Standardization_Layer",
+      "emission_split": 0.30,
+      "description": "Incentivizes the mapping, cleaning, and schema-alignment of disparate subnet outputs."
+    }
+  ],
+  "hyperparameters": {
+    "min_allowed_weights": 16,
+    "max_weight_limit": 1.0,
+    "vtrust_min": 0.8,
+    "adjustment_alpha": 0.05
+  }
+}
