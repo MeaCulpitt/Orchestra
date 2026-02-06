@@ -8,7 +8,7 @@ In the Orchestra network, miners do not perform raw compute. They operate as **L
 A miner’s primary responsibility is the successful execution of complex, multi-subnet objectives. This work is divided into three critical management phases:
 
 * **Task Decomposition:** Upon receiving a high-level objective, the miner must utilize a high-reasoning model to break the goal into a logical sequence of sub-tasks.
-* **Expert Procurement:** Using their internal Subnet Ledger, the miner identifies and programmatically "hires" the best-performing expert subnets (e.g., SN19 for data, SN103 for reasoning) to fulfill each stage of the roadmap.
+* **Expert Procurement:** Using their internal Subnet Ledger, the miner identifies and programmatically "hires" the best-performing expert subnets to fulfill each stage of the roadmap.
 * **Synthesis & Delivery:** The miner aggregates the disparate outputs from these experts, performs a final quality audit, and packages the result into a single, high-value solution for the user.
 
 ---
