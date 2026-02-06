@@ -1,60 +1,46 @@
-# 🛠️ Miner Design: The Strategic Dispatcher
+# 🛠️ Miner Design: The Strategic Lead (General Contractor)
 
-Miners in the SN-Orchestra subnet act as the "Managerial Intelligence" of Bittensor. Unlike traditional compute miners, Orchestra miners specialize in task decomposition, cross-subnet resource procurement, and the high-fidelity standardization of JSON data structures.
+Miners in the Orchestra subnet do not provide raw compute; they provide **Managerial Compute**. A successful Miner acts as the General Contractor of the Bittensor ecosystem, specializing in intent-to-execution mapping and cross-subnet resource procurement.
 
 ---
 
-## 1. Miner Tasks
-The miner's workflow is a multi-stage process that transforms a raw validator request into a verified, structured solution.
+## 1. Core Responsibilities: The Lifecycle of a Project
+The Miner's operations are divided into three distinct phases of "Executive Work":
 
-### A. Intent Decomposition & Planning
-Upon receiving a `OrchestraSynapse`, the miner must first analyze the complexity of the prompt. It utilizes a local reasoning engine (e.g., Llama-3-70B or equivalent) to generate an **Execution DAG** (Directed Acyclic Graph), identifying which external subnets are required for each sub-task.
+### A. Phase 1: Intent Decomposition & Pipeline Planning
+Upon receiving an `OrchestraSynapse`, the Miner utilizes a local high-reasoning engine (e.g., Llama-3.1-70B or customized Mistral Large) to:
+* Identify the **Prerequisite Graph**: What information is needed first?
+* Generate the **Execution DAG**: A step-by-step roadmap of which specialized subnets (Experts) must be called and in what order.
+* **Cost-Benefit Analysis**: Determine the optimal Alpha/TAO spend vs. the expected reward from the Validator.
 
-### B. Expert Procurement (Cross-Subnet Routing)
-The miner acts as an "Agentic Buyer," selecting the best UIDs from specialized subnets.
-* **Code:** Interfaces with SN62 (Ridges).
-* **Data Retrieval:** Interfaces with SN13 (Data Universe) or SN5 (OpenKaito).
-* **Search:** Interfaces with SN22 (Smart Search).
+### B. Phase 2: Expert Procurement & Management
+The Miner orchestrates the work across the metagraph:
+* **UID Discovery**: Querying specialized subnets (SN62 for code, SN13 for data, SN22 for search) to find the highest-performing UIDs.
+* **Asynchronous Execution**: Managing multiple simultaneous calls to prevent latency penalties.
+* **Quality Control (QC)**: If an expert returns a hallucination or an error, the Miner must detect it and "re-hire" a different UID to ensure the final synthesis is accurate.
 
-### C. JSON Standardization Layer (The Normalization Engine)
-One of the most critical tasks is the **Standardization Layer**. When a miner retrieves data from multiple subnets, that data is often "noisy" and disparate in format. The miner must:
-* **Normalize:** Map varying keys (e.g., `user_id` vs `uid`) to a unified schema.
-* **Validate:** Ensure the JSON is structurally sound and typed according to the validator's requirements.
-* **Enrich:** Inject metadata such as the source subnet ID and a "Trust Score" for each data point.
+### C. Phase 3: The JSON Standardization Layer
+This is the "Final Inspection" before delivery. The Miner must:
+* **Normalize**: Align disparate JSON keys (e.g., `user_id` vs `uid`) to the Validator's `target_schema`.
+* **Type Enforcement**: Use Pydantic models to ensure floats, strings, and lists are correctly typed.
+* **Provenance Tagging**: Inject metadata identifying which expert subnets provided each piece of data.
 
 ---
 
 ## 2. Expected Input → Output Format
-Miners communicate using the `OrchestraSynapse`, ensuring a strict data contract for every interaction.
+Miners must adhere to the strict `OrchestraSynapse` contract:
 
-### Input (From Validator)
-* **`objective` (str):** The high-level task (e.g., "Retrieve 2026 tech trends and format as a React-ready JSON").
-* **`target_schema` (dict):** The specific JSON structure the validator expects for the final data.
-* **`max_latency` (int):** The block-time deadline for submission.
-
-### Output (To Validator)
-* **`final_completion` (str):** The human-readable synthesis of the work.
-* **`standardized_data` (json):** The normalized JSON payload, structured exactly to the `target_schema`.
-* **`task_pipeline` (list):** A verifiable log of every external subnet call, containing:
-    * `subnet_id`: The ID of the expert subnet called.
-    * `external_uid`: The UID of the expert miner used.
-    * `proof_hash`: The cryptographic hash of the transaction proof.
+* **Input (Validator):**
+    * `objective` (str): The complex task (e.g., "Analyze SN13 tech trends and generate a Python viz").
+    * `target_schema` (json): The required structure for the final standardized data.
+* **Output (Miner):**
+    * `task_pipeline` (list): A step-by-step log of every subnet called, including UID and hash-locked proof.
+    * `standardized_data` (json): The normalized, type-safe payload.
+    * `final_synthesis` (str): The human-readable summary of the completed project.
 
 ---
 
-## 3. Performance Dimensions
-Miners are ranked relative to their peers across four key metrics. To maintain a top-tier UID, miners must balance these dimensions:
-
-| Dimension | Metric | Description |
-| :--- | :--- | :--- |
-| **Logic Fidelity** | **Reasoning Score** | Measured by the Judge LLM’s assessment of the decomposition path. |
-| **Data Accuracy** | **Schema Matching** | Percentage of fields in `standardized_data` that match the `target_schema` perfectly. |
-| **Fidelity** | **Hash Verification** | Verification of signed receipts from external subnets; invalid hashes result in a zero score. |
-| **Velocity** | **Block Latency** | Time taken to synthesize and return results. Faster miners receive a "Speed Multiplier" in the OES. |
-
----
-
-## 🏗️ Hardware Requirements (Estimated 2026)
-* **GPU:** 1x RTX 4090 or A100 (Minimum 24GB VRAM for local reasoning and JSON parsing).
-* **CPU:** 16+ Cores (High concurrency for managing multiple asynchronous subnet calls).
-* **Bandwidth:** 1Gbps+ (Critical for fetching large JSON payloads from data subnets).
+## 3. Hardware Requirements (Estimated 2026)
+* **GPU:** 1x RTX 4090 or A100 (Required for local LLM-based decomposition and synthesis).
+* **RAM:** 64GB+ (To handle high-concurrency async operations).
+* **Network:** 1Gbps+ (Critical for high-volume JSON ingestion from multiple subnets).
