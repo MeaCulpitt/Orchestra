@@ -1,53 +1,54 @@
-The SN-Orchestra incentive mechanism is designed to reward "Managerial Alpha"—the ability to efficiently decompose, route, and synthesize complex tasks and data. By implementing a multi-layered verification protocol, the subnet ensures that emissions flow toward miners who contribute genuine orchestration value.
+# ⚙️ Incentive & Mechanism Design: Orchestra
+
+The Orchestra incentive mechanism is engineered to reward **Executive Intelligence**. In the Bittensor ecosystem of 2026, raw compute is a commodity; the ability to manage, verify, and standardize that compute into a finished product is the alpha.
 
 ---
 
 ## 1. Emission and Reward Logic
-SN-Orchestra follows the **Yuma Consensus** model for reward distribution. Every 360 blocks (one tempo), the subtensor blockchain calculates emissions based on the weight matrices submitted by validators.
+SN-Orchestra operates on a dual-incentive structure within the Yuma Consensus framework. Emissions are distributed based on a Miner’s ability to act as a high-fidelity "General Contractor."
 
-* **Validator Emissions:** 18% of the subnet's total emission is distributed to validators based on their **V-Trust** (consensus with other validators).
-* **Miner Emissions:** 82% of the emission flows to miners based on their **Orchestration Efficiency Score (OES)**.
-* **Recycling:** In 2026, a 2% "Development Fee" is recycled into the subnet's **Alpha Liquidity Pool** to stabilize the token price and incentivize long-term participation.
+* **Validator Rewards (18%):** Distributed based on V-Trust and the accuracy of their audits.
+* **Miner Rewards (82%):** Distributed based on the **Orchestration Efficiency Score (OES)**.
 
----
-
-## 2. Incentive Alignment for Miners and Validators
-We utilize a "Dual-Incentive" structure to align the interests of all participants with the quality of the network.
-
-### For Miners: The Efficiency Flywheel
-Miners are incentivized to optimize for **Cost-to-Quality ratios**. Because miners must pay for services on external subnets (e.g., SN62 for code), they are naturally incentivized to select the highest-performing yet most cost-effective "Experts." A miner who overspends on sub-tasks reduces their own profit margin, while a miner who uses "cheap/bad" experts fails the validator's quality audit.
-
-### For Validators: The Reputation Bond
-Validators earn dividends proportional to their stake and their consensus score. If a validator diverges from the group by rewarding "junk" miners, their V-Trust drops, directly reducing their TAO and Alpha earnings. This forces validators to constantly refine their judging LLMs and logic traps.
+To ensure long-term sustainability, 30% of the Miner emission pool is specifically earmarked for the **JSON Standardization Layer (Mechanism 1)**, while 70% rewards the **Strategic Routing & Pipeline Management (Mechanism 0)**.
 
 ---
 
-## 3. Mechanisms to Discourage Adversarial Behavior
-To protect the subnet from "collusion cabals" and "lazy mining," we implement three specific defense layers:
+## 2. The Orchestration Efficiency Score (OES)
+The OES is a multi-variate formula that mathematically defines the "Quality of Management."
 
-* **Hash-Locked Execution Proofs:** Miners must provide the cryptographic transaction hash for every sub-task performed on an external subnet. If the hash is missing or belongs to a different UID, the miner is blacklisted.
-* **Logic Trap Injection:** Validators periodically send "Golden Tasks" (tasks with known optimal decomposition paths). Miners who fail these hidden tests are severely penalized in the ranking matrix.
-* **JSON Schema Enforcement:** For data-centric tasks, miners must return information in a strict, pre-defined JSON format. Failure to normalize data from disparate subnets results in a "Format Penalty," ensuring the subnet remains useful for downstream LLMs.
+$$OES = (W_{r} \cdot R) + (W_{p} \cdot P) + (W_{d} \cdot D) + (W_{v} \cdot V)$$
 
----
-
-## 4. Proof of Effort & Intelligence
-SN-Orchestra qualifies as a **"Proof of Effort"** (PoE) and **"Proof of Intelligence"** (PoI) system because:
-
-1. **Proof of Effort:** To provide a valid `task_pipeline`, a miner *must* have spent Alpha/TAO on other subnets. This creates a tangible economic "Work Proof" that cannot be spoofed without actual network participation.
-2. **Proof of Intelligence:** Decomposition is a high-reasoning task. A miner cannot simply "copy-paste" from an API; they must dynamically map a human intent to a machine-readable DAG and transform raw JSON into structured knowledge.
+| Component | Variable | Definition |
+| :--- | :--- | :--- |
+| **Reasoning** | $R$ | The logical validity of the Task Decomposition DAG. |
+| **Procurement** | $P$ | Verifiable proof (hashes) of expert hiring across the metagraph. |
+| **Data Integrity** | $D$ | Adherence to the strict JSON Standardization Layer requirements. |
+| **Velocity** | $V$ | A multiplier for sub-second coordination and synthesis. |
 
 ---
 
-## 5. High-Level Algorithm
-The following sequence describes a single orchestration epoch, incorporating both task execution and data standardization:
+## 3. Managerial Alignment: Proof of Effort & Intelligence
+Orchestra qualifies as a genuine **Proof of Intelligence (PoI)** system because it requires miners to solve the "Coordination Problem."
 
-1. **Task Assignment:** The Validator generates a multi-objective prompt or a data-retrieval request and broadcasts the `OrchestraSynapse` to the top 256 miners.
-2. **Decomposition & Mapping:** The Miner decomposes the task into sub-steps and maps the required data outputs to a **Unified JSON Schema**.
-3. **Execution (Routing):** The Miner queries external specialized subnets, collecting both the raw responses and the signed response hashes.
-4. **Standardization (The Data Layer):** The Miner transforms disparate JSON information from external subnets into the standardized format requested by the validator, enriching it with contextual metadata.
-5. **Submission:** The Miner populates the `task_pipeline`, `final_completion`, and `standardized_data` fields and returns the Synapse.
-6. **Validation:** The Validator verifies the external hashes, audits the reasoning path using a "Judge LLM," and checks the integrity of the JSON structure against the target schema.
-7. **Scoring:** The Validator calculates the OES: 
-   $$OES = (W_{r} \cdot Reasoning) + (W_{f} \cdot Fidelity) + (W_{u} \cdot Utility) + (W_{d} \cdot Data\_Integrity)$$
-8. **Reward Allocation:** Scores are converted into a weight vector $W$ and committed to the blockchain for the next emission cycle.
+1. **Proof of Effort (The Procurement Gate):** Miners cannot spoof results. To receive a score above zero, a miner must provide cryptographic transaction hashes from external subnets. This ensures the miner has "skin in the game" by spending resources to fulfill the user's request.
+2. **Proof of Intelligence (The Reasoning Gate):** Validators inject **Logic Traps**—tasks where a naive routing path will lead to an incorrect synthesis. Miners must use local high-reasoning models to navigate these traps, proving they are actively "managing" the pipeline rather than blindly forwarding packets.
+
+---
+
+## 4. High-Level Algorithm: The Execution Lifecycle
+The following 7-step sequence describes the lifecycle of a single orchestration event:
+
+1. **Intent Broadcast:** The Validator broadcasts a complex objective and a `target_schema` to the miner pool.
+2. **Decomposition:** The Miner generates a **Task DAG**, identifying the specific subnets (Experts) required to fulfill the request.
+3. **Execution & Routing:** The Miner programmatically "hires" the identified Experts, managing the asynchronous timing of their responses.
+4. **The Managerial Loop (Verification):** The Miner audits the Expert outputs. If an Expert provides a low-quality or malformed response, the Miner is incentivized to re-route to a different UID to protect their own OES.
+5. **JSON Standardization:** The Miner passes the "dirty" Expert data through the **Standardization Layer**, mapping it to the requested schema and enriching it with provenance metadata.
+6. **Submission:** The Miner returns the `standardized_data` and the `task_pipeline` (with execution hashes) to the Validator.
+7. **Audit & Scoring:** The Validator verifies the hashes, runs a Pydantic check on the JSON, and utilizes a "Judge LLM" to grade the logic of the initial decomposition. Weights are then set on-chain.
+
+---
+
+## 5. Adversarial Defenses
+* **Collusion Penalties:** Validators utilize semantic similarity checks to identify miners who are sharing the same execution paths or standardized outputs.
+* **Hash Blacklisting:** Re-using a transaction hash from a previous epoch or a different miner results in an immediate and permanent "black-rooming" of the UID.
