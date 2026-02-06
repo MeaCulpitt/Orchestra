@@ -1,45 +1,39 @@
-# ⚖️ Validator Design: The Logic & Data Auditor
+# ⚖️ Validator Design: The Executive Auditor
 
-Validators on SN-Orchestra serve as the "Source of Truth" for orchestration quality and data integrity. They are responsible for auditing miner performance, verifying cross-subnet execution proofs, and enforcing the JSON Standardization Layer to ensure the network delivers high-utility, structured intelligence.
-
----
-
-## 1. Scoring and Evaluation Methodology
-The scoring process on SN-Orchestra is a multi-dimensional audit that evaluates both the "Managerial Logic" and the "Data Fidelity" of the miner's response.
-
-### A. The Orchestration Efficiency Score (OES)
-Validators calculate a weighted score based on four primary pillars:
-$$OES = (W_{r} \cdot Reasoning) + (W_{f} \cdot Fidelity) + (W_{u} \cdot Utility) + (W_{d} \cdot Data\_Integrity)$$
-
-* **Reasoning ($W_{r}$):** Evaluated via a high-tier Consensus Judge LLM (e.g., SN1 Apex) to ensure the decomposition of the task was logically sound.
-* **Fidelity ($W_{f}$):** Structural verification of **Hash-Locked Execution Proofs**. Validators verify the cryptographic signatures from external subnets to confirm the miner actually "hired" the claimed experts.
-* **Utility ($W_{u}$):** A semantic grade of the final synthesized answer compared against a "Golden Reference" for synthetic tasks.
-* **Data Integrity ($W_{d}$):** Verification of the **JSON Standardization Layer**. Validators check the miner's `standardized_data` against a target schema (Pydantic-based validation) to ensure it is machine-readable and error-free.
-
-### B. Logic & Schema Traps
-Validators periodically inject "Trap Tasks" which include:
-* **Logic Traps:** Challenges with a hidden dependency that a "lazy" miner will likely skip.
-* **Schema Traps:** Requests with complex or non-standard JSON requirements. Miners who fail to normalize this data to the exact schema are heavily penalized.
+The SN-Orchestra Validator ensures the integrity of the "Managerial Layer." It does not just grade the final answer; it audits the Miner's decision-making process, ensuring they are acting as efficient project managers rather than simple pass-through proxies.
 
 ---
 
-## 2. Evaluation Cadence
-To maintain a high-performance metagraph in the 2026 dTAO environment, validation occurs on two distinct temporal tracks:
+## 1. Scoring & Evaluation Methodology
+The Validator calculates the **Orchestration Efficiency Score (OES)** through a rigorous four-part audit:
 
-* **Synthetic Challenges (Leaderboard Track):** Every **20 blocks** (approx. 4 minutes), the validator sends a hidden synthetic probe to all miners. This ensures the metagraph is constantly re-ranked based on current latency and accuracy.
-* **Organic Auditing (Service Track):** For organic API traffic, validators perform "Spot Checks." They intercept a sample of real-world responses to ensure miners maintain the same quality for users as they do for synthetic probes.
-* **Weight Commitment:** Every **360 blocks (one tempo)**, validators aggregate these moving averages and commit the weight matrix to the Subtensor blockchain, triggering the distribution of Alpha and TAO emissions.
+### A. The Logic Audit (The "Brain" Check)
+The Validator uses a high-tier "Judge LLM" (e.g., GPT-4o or SN1 Apex) to evaluate the Miner's `task_pipeline`.
+* **Score Factor:** Was the decomposition logical? Did the miner use the correct subnets?
+* **Trap Detection:** If the Miner missed a "Logic Trap" injected by the Validator, the Reasoning score is decimated.
+
+### B. The Procurement Audit (The "Work" Check)
+The Validator verifies the cryptographic **Hash-Locked Execution Proofs** provided in the `task_pipeline`.
+* **Validation:** Every expert call must correspond to a verifiable transaction on the respective subnet's blockchain.
+* **Anti-Cheat:** Miners attempting to "simulate" expert data without actually hiring experts are immediately blacklisted.
+
+### C. The JSON Integrity Audit (The "Format" Check)
+The Validator runs the Miner's `standardized_data` through a strict Pydantic validation suite.
+* **Success:** The JSON perfectly matches the `target_schema`.
+* **Failure:** Any type mismatch (e.g., string instead of float) or missing field results in a zero-score for the Standardization component.
 
 ---
 
-## 3. Validator Incentive Alignment (dTAO Model)
-Under the **Dynamic TAO** framework, validators are economically bonded to the subnet’s accuracy and reputation.
+## 2. Evaluation Cadence & Strategy
+Validators maintain high-fidelity rankings through two distinct temporal tracks:
 
-* **V-Trust (Consensus Alignment):** A validator's rewards are tied to their **V-Trust** score. If a validator’s rankings diverge from the stake-weighted median of the network (e.g., by rewarding a "collusion cabal"), their emissions are slashed.
-* **Alpha Staking Dividends:** Validators earn dividends in the subnet’s native **Alpha token ($\alpha$)**. By effectively filtering out low-quality miners and promoting high-utility data orchestration, validators increase the subnet's overall market value, directly benefiting their own staked position.
-* **The Reputation Market:** In 2026, high-performing validators attract more delegated stake. By maintaining a superior "Standardization Layer," validators prove to the community that the subnet provides real-world utility, securing their position in the top 64 validator slots.
+* **Synthetic Probing (Every 20 Blocks):** Rapid-fire challenges designed to test specific edge cases, logic traps, and complex schema requirements. This prevents "Rank Stagnation."
+* **Organic Traffic (Real-time):** When a user sends a real request through the Orchestra API, the Validator monitors the fulfillment to ensure production-grade reliability.
+* **Weight Setting (Every 360 Blocks):** Aggregated scores are converted into weights and committed to the Subtensor, determining Alpha ($\alpha$) and TAO rewards.
 
 ---
 
-## 4. Proof of Intelligence: Data Orchestration
-By enforcing the **JSON Standardization Layer**, validators provide a verifiable "Proof of Intelligence." A miner cannot simply relay raw data; they must demonstrate the cognitive effort of mapping, cleaning, and structuring disparate information into a unified format. This transforms the subnet from a simple router into a high-value **Knowledge Factory**.
+## 3. Validator Incentive Alignment
+Under the **Dynamic TAO (dTAO)** model, Validators are economically incentivized to protect the subnet's reputation.
+* **V-Trust:** Validators who reward low-quality or adversarial miners will see their V-Trust drop, reducing their own emission yields.
+* **Value Accrual:** By strictly enforcing the **JSON Standardization Layer**, Validators ensure Orchestra becomes the "Gold Standard" for enterprise RAG, increasing the value of the subnet's native Alpha token.
