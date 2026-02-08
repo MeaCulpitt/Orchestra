@@ -121,8 +121,7 @@ Validators verify miner proposals against live subnet state.
 │    │                       │                      │              │
 │    │                       │   [If verified]      │              │
 │    │                       │── Commit update ────▶│ ✓            │
-│    │◀── Contribution ──────│                      │              │
-│    │   reward              │                      │              │
+│    │                       │                      │              │
 │    │                       │   [If rejected]      │              │
 │    │◀── Stake slashed ─────│                      │              │
 │                                                                  │
@@ -130,22 +129,6 @@ Validators verify miner proposals against live subnet state.
 ```
 
 ### Verification by Proposal Type
-
-**New subnet discovery:**
-```python
-async def verify_new_subnet(proposal):
-    # Probe the subnet directly
-    response = await probe_subnet(proposal.subnet_id)
-    
-    if response is None:
-        return False  # Subnet doesn't exist/respond
-    
-    # Compare proposed schema to actual
-    actual_schema = extract_schema(response)
-    proposed_schema = proposal.entry.output_schema
-    
-    return schemas_match(actual_schema, proposed_schema)
-```
 
 **Schema update:**
 ```python
@@ -166,6 +149,22 @@ async def verify_schema_update(proposal):
             return False
     
     return True
+```
+
+**New subnet discovery:**
+```python
+async def verify_new_subnet(proposal):
+    # Probe the subnet directly
+    response = await probe_subnet(proposal.subnet_id)
+    
+    if response is None:
+        return False  # Subnet doesn't exist/respond
+    
+    # Compare proposed schema to actual
+    actual_schema = extract_schema(response)
+    proposed_schema = proposal.entry.output_schema
+    
+    return schemas_match(actual_schema, proposed_schema)
 ```
 
 **Deprecation:**
@@ -197,12 +196,12 @@ def resolve_ledger_conflict(proposals):
         if verify(prop):
             # First valid proposal wins
             commit(prop)
-            reward(prop.miner, FULL_REWARD)
+            credit(prop.miner, FULL_WEIGHT)
             
             # Later valid proposals get confirmation bonus
             for later in sorted_props[1:]:
                 if verify(later):
-                    reward(later.miner, CONFIRMATION_REWARD)
+                    credit(later.miner, CONFIRMATION_WEIGHT)
             return
     
     # No valid proposals
@@ -212,9 +211,9 @@ def resolve_ledger_conflict(proposals):
 
 ---
 
-## Scoring Formulas
+## Scoring
 
-### Orchestration Score (60% of total)
+### Orchestration Score (60%)
 
 ```
 S_orch = (0.20 × hash_verified) + 
@@ -224,7 +223,7 @@ S_orch = (0.20 × hash_verified) +
          (0.05 × latency_ok)
 ```
 
-### Ledger Score (40% of total)
+### Ledger Score (40%)
 
 ```
 S_ledger = (0.20 × update_accuracy) + 
@@ -266,4 +265,122 @@ SYNTHETIC_TEMPLATES = [
 def generate_synthetic():
     template = random.choice(SYNTHETIC_TEMPLATES)
     topic = random.choice(TOPICS[template["type"]])
-    return
+    return Challenge(
+        objective=template["template"].format(topic=topic),
+        reference=template["reference_subnets"]
+    )
+```
+
+### Organic Challenges
+
+Real user requests routed through the network:
+
+```python
+async def handle_user_request(request):
+    challenge = Challenge(
+        objective=request.objective,
+        target_schema=request.schema,
+        is_organic=True
+    )
+    
+    responses = await broadcast_to_miners(challenge)
+    scored = [(r, score(r)) for r in responses]
+    best = max(scored, key=lambda x: x[1])
+    
+    await deliver_to_user(request.user_id, best[0])
+    return scored
+```
+
+---
+
+## Anti-Gaming Detection
+
+### Fabricated Hashes
+
+**Signal:** Hash doesn't exist on subnet chain
+**Action:** Zero score, blacklist consideration
+
+### Pre-Computed Responses
+
+**Signal:** Hash timestamp before challenge issued
+**Action:** Zero score
+
+### Stale Ledger Proposals
+
+**Signal:** Proposal describes change that doesn't exist
+**Action:** Reject + slash stake
+
+### Copied Proposals
+
+**Signal:** Near-identical proposals from multiple miners within short window
+**Action:** Only first proposer rewarded
+
+---
+
+## Validator Infrastructure
+
+### Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 8-core | 16-core |
+| RAM | 32GB | 64GB |
+| Storage | 200GB SSD | 500GB SSD |
+| Network | 500Mbps | 1Gbps |
+
+Higher than miners because validators must:
+- Verify hashes across multiple subnets
+- Run Pydantic validation on all responses
+- Probe subnets for Ledger verification
+- Store challenge/response history
+
+### Software
+
+- Bittensor validator SDK
+- Pydantic
+- PostgreSQL (challenge history)
+- Redis (caching)
+- Async HTTP client
+
+---
+
+## Consensus
+
+Validators converge because most checks are deterministic:
+
+| Check | Deterministic? |
+|-------|----------------|
+| Hash verification | Yes |
+| Schema validation | Yes |
+| Completeness | Yes |
+| Routing efficiency | Mostly (reference decompositions) |
+| Ledger verification | Yes (probe results) |
+
+Validators who deviate significantly from consensus see V-Trust decay:
+
+```python
+def update_v_trust(validator):
+    consensus = stake_weighted_median(all_scores)
+    deviation = mean_absolute_error(validator.scores, consensus)
+    
+    if deviation < 0.05:
+        validator.v_trust += 0.01
+    elif deviation > 0.15:
+        validator.v_trust -= 0.05
+```
+
+Low V-Trust = lower dividend share.
+
+---
+
+## Cadence
+
+| Event | Frequency |
+|-------|-----------|
+| Orchestration challenges | Every 20 blocks (~4 min) |
+| Ledger proposal window | Rolling (any time) |
+| Ledger verification | Within 5 blocks of proposal |
+| Weight commitment | Every 360 blocks (~1 hr) |
+| Ledger snapshot (on-chain) | Every 100 blocks (~20 min) |
+
+---
