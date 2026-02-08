@@ -1,188 +1,223 @@
-# Orchestra: The Orchestration Layer for Bittensor
+# Orchestra: Orchestration Layer + Subnet Registry for Bittensor
 
-Orchestra coordinates Bittensor subnets to complete complex tasks. Instead of manually querying multiple subnets and synthesizing their outputs, you send Orchestra a high-level objective — it handles decomposition, routing, execution, and delivery.
+Orchestra provides two products:
 
-One request in. Structured result out.
+1. **Managed Intelligence** — Submit complex objectives, receive structured results. Miners coordinate multiple subnets on your behalf.
+
+2. **The Subnet Ledger** — The canonical, validated registry of every Bittensor subnet's capabilities, schemas, and endpoints. One API for subnet discovery.
+
+Both products reinforce each other: orchestration work generates Ledger updates; the Ledger enables better orchestration.
 
 ---
 
 ## The Problem
 
-Bittensor has 100+ specialized subnets. Each does one thing well:
-- SN22 (Desearch) searches the web
-- SN1 (Apex) runs algorithmic competitions
-- SN62 (Ridges) executes agent tasks
-- SN13 (Data Universe) scrapes structured data
-- SN64 (Chutes) runs inference
+Bittensor has 100+ specialized subnets. Using them is hard:
 
-But real tasks require multiple subnets working together. Today, that means:
+| Challenge | Impact |
+|-----------|--------|
+| **Discovery** | Which subnet does what? No central registry. |
+| **Integration** | Each subnet has different APIs, schemas, formats. |
+| **Coordination** | Complex tasks require multiple subnets working together. |
+| **Reliability** | Schema changes break integrations. No freshness guarantees. |
 
-| Step | You do it manually |
-|------|-------------------|
-| 1 | Figure out which subnets you need |
-| 2 | Learn each subnet's API/Synapse format |
-| 3 | Query each subnet separately |
-| 4 | Handle failures and retries |
-| 5 | Reconcile different output formats |
-| 6 | Synthesize into a coherent result |
-
-This is the **Fragmentation Tax** — the overhead of coordinating decentralized intelligence.
+For developers building agents or applications on Bittensor, this is the **Fragmentation Tax** — hours spent on integration instead of product.
 
 ---
 
-## How Orchestra Works
+## Product 1: Managed Intelligence
+
+Submit a high-level objective. Orchestra handles decomposition, routing, execution, and synthesis.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     ORCHESTRA PIPELINE                           │
+│                   MANAGED INTELLIGENCE                           │
 ├─────────────────────────────────────────────────────────────────┤
-│  1. REQUEST         User submits high-level objective           │
-│                     "Analyze competitor pricing and recommend   │
-│                      a strategy for our inference API"          │
-├─────────────────────────────────────────────────────────────────┤
-│  2. DECOMPOSITION   Miner breaks objective into subnet tasks    │
-│                     → Market data (SN22)                        │
-│                     → Competitor scraping (SN13)                │
-│                     → Strategic synthesis (SN1)                 │
-├─────────────────────────────────────────────────────────────────┤
-│  3. EXECUTION       Miner queries subnets, collects outputs     │
-│                     Hash-locked proofs verify real calls        │
-├─────────────────────────────────────────────────────────────────┤
-│  4. SYNTHESIS       Miner aggregates and structures results     │
-│                     Pydantic-validated JSON output              │
-├─────────────────────────────────────────────────────────────────┤
-│  5. DELIVERY        User receives structured, verified result   │
-│                     Ready for downstream integration            │
+│                                                                  │
+│  YOU                      ORCHESTRA                SUBNETS       │
+│   │                          │                        │          │
+│   │── "Analyze competitor ──▶│                        │          │
+│   │    pricing and           │── Query ──────────────▶│ SN22     │
+│   │    recommend strategy"   │── Query ──────────────▶│ SN13     │
+│   │                          │── Query ──────────────▶│ SN1      │
+│   │                          │◀── Results ────────────│          │
+│   │◀── Structured report ────│                        │          │
+│   │    (Pydantic-validated)  │                        │          │
+│                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Miners** are Lead Architects — they manage the project, not the compute.
-**Validators** audit the work — verify subnet calls happened, check output quality.
-**Users** get results — no coordination overhead.
+**You get:** Structured, validated results. No subnet integration work.
+
+**You pay:** Per-project fee (covers subnet costs + margin).
 
 ---
 
-## Worked Example: Competitive Analysis
+## Product 2: The Subnet Ledger
 
-### Request
+The canonical registry of Bittensor subnet capabilities. Validated, versioned, always current.
 
 ```json
 {
-  "objective": "Analyze cloud GPU pricing from major providers and recommend positioning for a new inference API priced competitively against RunPod and Vast.ai",
-  "target_schema": {
-    "competitors": [{"name": "str", "pricing": "dict", "strengths": "list"}],
-    "recommendation": {"price_point": "float", "rationale": "str"},
-    "confidence": "float"
+  "SN22": {
+    "name": "Desearch",
+    "description": "Web and social search",
+    "capabilities": ["web_search", "news_search", "social_search"],
+    "input_schema": {
+      "query": {"type": "string", "required": true},
+      "max_results": {"type": "integer", "default": 10}
+    },
+    "output_schema": {
+      "results": {"type": "array", "items": "SearchResult"},
+      "total_found": {"type": "integer"}
+    },
+    "endpoint": "Synapse.Desearch",
+    "avg_latency_ms": 340,
+    "reliability": 0.97,
+    "cost_per_query": 0.002,
+    "last_verified": "2026-02-08T22:30:00Z",
+    "version": "2.3.1"
   }
 }
 ```
 
-### Miner Decomposition
+**Use cases:**
 
-```
-Task 1: Market research
-  → Subnet: SN22 (Desearch)
-  → Query: "cloud GPU pricing RunPod Vast.ai Lambda Labs 2026"
-  → Expected: Recent pricing data, market positioning
+| Customer | Use Case |
+|----------|----------|
+| Agent frameworks | Route tasks to correct subnets |
+| LLM applications | Tool-use with Bittensor backends |
+| Developers | Discover and integrate subnets |
+| Other subnets | Cross-subnet coordination |
 
-Task 2: Structured data extraction  
-  → Subnet: SN13 (Data Universe)
-  → Query: Scrape pricing pages for RunPod, Vast.ai, Lambda
-  → Expected: Structured JSON with tiers, specs, prices
+**You get:** Verified schemas, real-time accuracy, single API.
 
-Task 3: Strategic synthesis
-  → Subnet: SN1 (Apex) or high-reasoning model
-  → Query: Synthesize findings into recommendation
-  → Expected: Price point, rationale, confidence score
-```
-
-### Execution
-
-| Step | Subnet | Query | Cost | Result |
-|------|--------|-------|------|--------|
-| 1 | SN22 | Web search | 0.002 TAO | 15 relevant articles |
-| 2 | SN13 | Page scraping | 0.003 TAO | Structured pricing for 3 providers |
-| 3 | SN1 | Synthesis | 0.004 TAO | Recommendation + rationale |
-
-**Total subnet cost:** 0.009 TAO
-
-### Delivery
-
-```json
-{
-  "task_pipeline": [
-    {"subnet": "SN22", "query": "...", "hash": "0x7a3f...", "latency_ms": 340},
-    {"subnet": "SN13", "query": "...", "hash": "0x8b2c...", "latency_ms": 890},
-    {"subnet": "SN1", "query": "...", "hash": "0x9d1e...", "latency_ms": 450}
-  ],
-  "standardized_data": {
-    "competitors": [
-      {"name": "RunPod", "pricing": {"a100_80gb": 1.99, "a40": 0.79}, "strengths": ["spot pricing", "templates"]},
-      {"name": "Vast.ai", "pricing": {"a100_80gb": 1.45, "a40": 0.65}, "strengths": ["lowest price", "marketplace"]},
-      {"name": "Lambda", "pricing": {"a100_80gb": 1.89, "a40": 0.99}, "strengths": ["reliability", "enterprise"]}
-    ],
-    "recommendation": {
-      "price_point": 0.72,
-      "rationale": "Position 10% below Vast.ai on A40 tier to capture price-sensitive users while maintaining margin above spot market volatility"
-    },
-    "confidence": 0.84
-  },
-  "final_synthesis": "Based on current market analysis, recommend $0.72/hr for A40-equivalent inference. This undercuts Vast.ai by 10% while remaining 15% above volatile spot pricing..."
-}
-```
-
-**User cost:** 0.012 TAO (subnet costs + Orchestra margin)
-**Miner earned:** 0.018 TAO (emissions) + 0.002 TAO (margin share)
-**Time:** 2.1 seconds total
+**You pay:** Per-lookup or subscription.
 
 ---
 
-## Payment Flow
+## Why Both Products?
+
+They create a flywheel:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      PAYMENT FLOW                                │
+│                      THE FLYWHEEL                                │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  USER                  ORCHESTRA              SUBNETS            │
-│    │                      │                      │               │
-│    │── Request + Fee ────▶│                      │               │
-│    │   (0.012 TAO)        │                      │               │
-│    │                      │                      │               │
-│    │                      │── Query + Pay ──────▶│ SN22          │
-│    │                      │   (0.002 TAO)        │               │
-│    │                      │── Query + Pay ──────▶│ SN13          │
-│    │                      │   (0.003 TAO)        │               │
-│    │                      │── Query + Pay ──────▶│ SN1           │
-│    │                      │   (0.004 TAO)        │               │
-│    │                      │                      │               │
-│    │                      │◀── Results ──────────│               │
-│    │◀── Delivery ─────────│                      │               │
-│                                                                  │
-│  Subnet costs: 0.009 TAO                                        │
-│  Orchestra margin: 0.003 TAO                                    │
-│  → Miner share: 0.002 TAO                                       │
-│  → Protocol: 0.001 TAO                                          │
+│   Orchestration jobs ──▶ Miners call subnets ──▶ Ledger updates │
+│         ▲                                              │         │
+│         │                                              ▼         │
+│   Better routing ◀──── Accurate Ledger ◀──── Verification       │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+- Every orchestration job tests subnet schemas → Ledger gets fresher
+- Fresher Ledger → better routing decisions → better orchestration
+- Both products share infrastructure costs
+
 ---
 
-## Why Not Call Subnets Directly?
+## Worked Example: Full Cycle
 
-| Direct calls | Orchestra |
-|--------------|-----------|
-| You figure out which subnets to use | Miner figures it out |
-| You learn each subnet's API | Standardized input/output |
-| You handle different response formats | Pydantic-validated JSON |
-| You synthesize outputs yourself | Miner synthesizes |
-| You retry on failures | Miner handles reliability |
-| You pay subnet costs only | Small premium for managed service |
+### User Request (Orchestration)
 
-**The tradeoff:** Your time and expertise vs. Orchestra's fee.
+```json
+{
+  "objective": "Research cloud GPU pricing and recommend positioning for our inference API",
+  "target_schema": {
+    "competitors": [{"name": "str", "pricing": "dict"}],
+    "recommendation": {"price_point": "float", "rationale": "str"}
+  }
+}
+```
 
-For developers building agents, the fee is worth it — one API call replaces hours of integration work.
+### Miner Execution
+
+1. **Consult Ledger:** Which subnets handle market research? → SN22 (search), SN13 (scraping)
+2. **Execute queries:** Call SN22 and SN13 with hash-locked proofs
+3. **Verify schemas:** Do responses match Ledger entries? If not, submit Ledger update
+4. **Synthesize:** Aggregate results into target schema
+5. **Deliver:** Return structured response + Ledger update proposals
+
+### Ledger Update (Byproduct)
+
+Miner noticed SN13 added a new field to its output:
+
+```json
+{
+  "subnet": "SN13",
+  "update_type": "schema_change",
+  "field": "output_schema.metadata.scrape_timestamp",
+  "old_value": null,
+  "new_value": {"type": "string", "format": "iso8601"},
+  "evidence_hash": "0x7a3f...",
+  "proposed_by": "miner_uid_42"
+}
+```
+
+### Validator Verification
+
+1. Validator calls SN13 directly
+2. Confirms new field exists
+3. Approves Ledger update
+4. Miner earns Ledger contribution reward
+
+---
+
+## The Ledger as Network Infrastructure
+
+The Ledger isn't just Orchestra's internal cache — it's a **shared network resource**:
+
+### On-Chain Registry
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    LEDGER ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  MINERS              SHARED LEDGER              VALIDATORS       │
+│    │                      │                         │            │
+│    │── Propose update ───▶│                         │            │
+│    │                      │◀── Verify against ──────│            │
+│    │                      │    live subnet          │            │
+│    │                      │                         │            │
+│    │◀── Read for routing ─│                         │            │
+│    │                      │                         │            │
+│  EXTERNAL USERS           │                         │            │
+│    │                      │                         │            │
+│    │◀── Query via API ────│                         │            │
+│    │    (paid access)     │                         │            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Access Tiers
+
+| Tier | Access | Price |
+|------|--------|-------|
+| **Free** | Subnet list, names, basic descriptions | 0 |
+| **Developer** | Full schemas, 1000 lookups/month | 0.1 TAO/month |
+| **Production** | Unlimited lookups, webhooks for changes | 1 TAO/month |
+| **Enterprise** | SLA, dedicated support, custom integrations | Custom |
+
+---
+
+## Moat: Why Not Just Scrape It Yourself?
+
+Anyone can poll the metagraph. Orchestra provides:
+
+| DIY | Orchestra Ledger |
+|-----|------------------|
+| Raw subnet list | Validated, tested schemas |
+| Self-reported capabilities | Verified via actual calls |
+| Point-in-time snapshot | Real-time with change tracking |
+| Your maintenance burden | Continuously updated by miners |
+| Unknown reliability | Reliability scores, latency metrics |
+| No SLA | Accuracy guarantees |
+
+**The value isn't the data — it's the trust layer.**
 
 ---
 
@@ -190,82 +225,80 @@ For developers building agents, the fee is worth it — one API call replaces ho
 
 | Document | Description |
 |----------|-------------|
-| [Incentive Mechanism](./docs/Incentive_Mechanism.md) | Scoring formula, emission split, anti-gaming |
-| [Miner Architecture](./docs/Miner_Design.md) | Decomposition, execution, Ledger maintenance |
-| [Validator Architecture](./docs/Validator_Design.md) | Audit methodology, scoring rubric |
-| [Business Rationale](./docs/Business_Rationale.md) | Problem statement, competitive landscape |
-| [Go-To-Market](./docs/Go_To_Market.md) | Target users, growth channels, incentives |
+| [Incentive Mechanism](./docs/Incentive_Mechanism.md) | Dual rewards: orchestration + Ledger contributions |
+| [Miner Architecture](./docs/Miner_Design.md) | Orchestration execution, Ledger updates |
+| [Validator Architecture](./docs/Validator_Design.md) | Verification methodology, Ledger governance |
+| [Business Rationale](./docs/Business_Rationale.md) | Dual-product strategy, revenue model |
+| [Go-To-Market](./docs/Go_To_Market.md) | Target customers, growth channels |
 
 ---
 
-## The Subnet Ledger
+## Revenue Model
 
-To route tasks effectively, miners maintain a real-time registry of subnet capabilities:
+| Product | Revenue Source | Flow |
+|---------|----------------|------|
+| Orchestration | Per-project fees | User → Orchestra → Subnets |
+| Ledger | Subscriptions + per-query | User → Orchestra |
+| Ledger Enterprise | Licensing to agent frameworks | Platform → Orchestra |
 
-```json
-{
-  "SN22": {
-    "name": "Desearch",
-    "capabilities": ["web_search", "social_search", "news"],
-    "input_schema": {"query": "str", "max_results": "int"},
-    "output_schema": {"results": "list[dict]", "metadata": "dict"},
-    "avg_latency_ms": 350,
-    "reliability": 0.97,
-    "cost_per_query": 0.002
-  },
-  "SN13": {
-    "name": "Data Universe", 
-    "capabilities": ["web_scraping", "structured_extraction"],
-    ...
-  }
-}
-```
-
-The Ledger is:
-- **Continuously updated** by miners polling the metagraph
-- **Validated** by validators through schema traps
-- **Shared** as a network resource for routing optimization
+Both products generate emissions for miners and validators.
 
 ---
 
 ## For Miners
 
-Earn TAO by:
-1. Receiving complex objectives from validators
-2. Decomposing into optimal subnet routing
-3. Executing queries with hash-locked proofs
-4. Synthesizing and delivering structured results
+Earn TAO through:
 
-### Unit Economics
+1. **Orchestration work** — Execute multi-subnet projects
+2. **Ledger contributions** — Discover new subnets, update schemas, maintain accuracy
 
-| Scenario | Subnet costs | Emissions | Margin share | Net profit |
-|----------|--------------|-----------|--------------|------------|
-| Simple (2 subnets) | 0.005 TAO | 0.012 TAO | 0.002 TAO | +0.009 TAO |
-| Complex (4 subnets) | 0.012 TAO | 0.022 TAO | 0.004 TAO | +0.014 TAO |
-| Failed decomposition | 0.008 TAO | 0 TAO | 0 TAO | -0.008 TAO |
-
-**Risk:** Bad routing = wasted subnet costs + zero emissions.
-**Reward:** Good routing = emissions + margin share.
+| Activity | Reward |
+|----------|--------|
+| Successful orchestration job | Emissions + margin share |
+| New subnet discovered | Discovery bonus |
+| Schema update accepted | Contribution reward |
+| High Ledger accuracy | Accuracy multiplier |
 
 ---
 
 ## For Validators
 
-Earn dividends by:
-1. Generating complex objectives (synthetic and organic)
-2. Verifying hash proofs of subnet calls
-3. Validating output against target schema
-4. Scoring decomposition quality
+Earn dividends through:
+
+1. **Orchestration verification** — Confirm hash proofs, validate outputs
+2. **Ledger governance** — Verify proposed updates, reject stale/false entries
 
 ---
 
 ## For Developers
 
-Integrate Orchestra to:
-- Complete multi-step tasks with one API call
-- Receive structured, validated JSON
-- Skip subnet integration overhead
-- Build agents that leverage the full metagraph
+**Using Orchestration:**
+```python
+from orchestra import OrchestraClient
+
+client = OrchestraClient(api_key="...")
+result = client.execute(
+    objective="Analyze competitor pricing...",
+    target_schema=MySchema
+)
+# result is Pydantic-validated, ready to use
+```
+
+**Using the Ledger:**
+```python
+from orchestra import LedgerClient
+
+ledger = LedgerClient(api_key="...")
+
+# Discover subnets by capability
+search_subnets = ledger.find(capability="web_search")
+
+# Get full schema for integration
+schema = ledger.get_schema("SN22")
+
+# Subscribe to changes
+ledger.on_change("SN22", callback=handle_schema_update)
+```
 
 ---
 
