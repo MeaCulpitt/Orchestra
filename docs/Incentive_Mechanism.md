@@ -1,289 +1,384 @@
 # Orchestra: Incentive & Mechanism Design
 
-Orchestra rewards **Proof of Management** — the ability to decompose complex objectives, route to optimal subnets, and deliver structured results. The mechanism balances coordination quality (70%) with Ledger accuracy (30%), using objective metrics wherever possible.
+Orchestra rewards two types of work:
+
+1. **Orchestration (60% of emissions)** — Successfully completing multi-subnet projects
+2. **Ledger Contributions (40% of emissions)** — Maintaining the shared Subnet Registry
+
+Both activities happen together: orchestration work naturally surfaces Ledger updates.
 
 ---
 
-## Worked Example: Scoring a Miner Response
+## Emission Split: 60/40
 
-### Challenge Issued
+### Orchestration (60%)
 
-Validator sends objective:
+Rewards miners for completing complex objectives:
+
+| Component | Weight | Measurement |
+|-----------|--------|-------------|
+| Hash verification | 20% | All subnet calls have valid on-chain proofs |
+| Schema compliance | 15% | Output matches target_schema |
+| Completeness | 10% | Required fields present and populated |
+| Routing efficiency | 10% | Optimal subnet selection |
+| Latency | 5% | Faster than deadline |
+
+### Ledger Contributions (40%)
+
+Rewards miners for maintaining the shared registry:
+
+| Component | Weight | Measurement |
+|-----------|--------|-------------|
+| Update accuracy | 20% | Proposed changes verified as correct |
+| Discovery | 10% | New subnets catalogued first |
+| Freshness | 5% | Detecting stale entries |
+| Coverage | 5% | Breadth of subnets maintained |
+
+---
+
+## Worked Example: Scoring a Response
+
+### Scenario
+
+Miner receives orchestration challenge and notices a schema change during execution.
+
+### Orchestration Task
 
 ```json
 {
-  "objective": "Find the top 5 trending AI papers this week and summarize their key contributions",
+  "objective": "Find trending AI research papers and summarize key findings",
   "target_schema": {
-    "papers": [{"title": "str", "authors": "list", "summary": "str", "impact": "str"}],
-    "meta": {"search_date": "str", "sources": "list"}
+    "papers": [{"title": "str", "summary": "str", "impact": "str"}],
+    "synthesis": "str"
   }
 }
 ```
 
-### Miner Response
+### Execution
+
+1. **Query SN22 (Desearch)** for paper search → Success, hash `0x7a3f...`
+2. **Query SN13 (Data Universe)** for abstract extraction → Success, hash `0x8b4e...`
+3. **Notice:** SN13 response includes new field `extraction_confidence` not in Ledger
+4. **Synthesize** results into target schema
+5. **Submit:** Orchestration response + Ledger update proposal
+
+### Orchestration Scoring
+
+| Component | Score | Calculation |
+|-----------|-------|-------------|
+| Hash verification | 1.0 | Both calls verified |
+| Schema compliance | 1.0 | Output passes validation |
+| Completeness | 1.0 | All fields present |
+| Routing efficiency | 0.9 | Good choices, minor optimization possible |
+| Latency | 1.0 | Under deadline |
+| **Orchestration total** | 0.59 | (0.20×1.0)+(0.15×1.0)+(0.10×1.0)+(0.10×0.9)+(0.05×1.0) |
+
+### Ledger Contribution Scoring
 
 ```json
 {
-  "task_pipeline": [
-    {"subnet": "SN22", "task": "search", "hash": "0x7a3f...", "verified": true},
-    {"subnet": "SN13", "task": "scrape", "hash": "0x8b2c...", "verified": true},
-    {"subnet": "SN1", "task": "summarize", "hash": "0x9d1e...", "verified": true}
-  ],
-  "standardized_data": {
-    "papers": [
-      {"title": "Scaling Laws for...", "authors": ["..."], "summary": "...", "impact": "..."},
-      // ... 4 more papers
-    ],
-    "meta": {"search_date": "2026-02-08", "sources": ["arxiv", "semantic_scholar"]}
-  },
-  "final_synthesis": "This week's trending papers focus on..."
+  "proposal": {
+    "subnet": "SN13",
+    "update_type": "schema_addition",
+    "path": "output_schema.extraction_confidence",
+    "value": {"type": "float", "range": [0, 1]},
+    "evidence_hash": "0x8b4e..."
+  }
 }
 ```
 
-### Scoring Breakdown
+Validator verifies:
+1. Calls SN13 directly
+2. Confirms `extraction_confidence` field exists
+3. Confirms type and range are correct
+4. **Approves update**
 
-| Component | Weight | Score | Calculation |
-|-----------|--------|-------|-------------|
-| **Hash verification** | 25% | 1.0 | All 3 subnet calls verified on-chain |
-| **Schema compliance** | 20% | 1.0 | Output passes Pydantic validation |
-| **Completeness** | 15% | 1.0 | All required fields present, 5 papers returned |
-| **Routing efficiency** | 10% | 0.9 | Optimal subnet selection (minor deduction: could skip SN13) |
-| **Ledger accuracy** | 30% | 0.95 | SN22 schema current, SN13 schema 2 days stale |
+| Component | Score | Calculation |
+|-----------|-------|-------------|
+| Update accuracy | 1.0 | Proposal verified correct |
+| Discovery | 0.5 | Not new subnet, but new field |
+| Freshness | 1.0 | Caught change within 24 hours |
+| Coverage | N/A | Not applicable this round |
+| **Ledger total** | 0.30 | (0.20×1.0)+(0.10×0.5)+(0.05×1.0)+(0.05×0) |
 
-**Final Score:** (0.25 × 1.0) + (0.20 × 1.0) + (0.15 × 1.0) + (0.10 × 0.9) + (0.30 × 0.95) = **0.935**
+### Combined Score
+
+```
+S_total = S_orchestration + S_ledger
+        = 0.59 + 0.30
+        = 0.89
+```
 
 ---
 
-## Emission Split: 70/30
+## Ledger Contribution Types
 
-### Coordination Pool (70% of emissions)
+### 1. New Subnet Discovery
 
-Rewards the miner's ability to act as a **Lead Architect**:
+First miner to accurately catalogue a new subnet.
 
-| Criterion | Weight | Measurement |
-|-----------|--------|-------------|
-| Hash verification | 25% | Binary: all subnet calls have valid on-chain proofs |
-| Schema compliance | 20% | Binary: output passes target_schema validation |
-| Completeness | 15% | Ratio: required fields present / total required |
-| Routing efficiency | 10% | Validator assessment: were chosen subnets optimal? |
+```json
+{
+  "proposal": {
+    "type": "new_subnet",
+    "subnet_id": "SN142",
+    "entry": {
+      "name": "NewSubnet",
+      "description": "...",
+      "capabilities": ["..."],
+      "input_schema": {...},
+      "output_schema": {...}
+    },
+    "evidence": {
+      "probe_hash": "0x...",
+      "sample_response": {...}
+    }
+  }
+}
+```
 
-**Why mostly binary metrics:** Subjective "quality" scoring is gameable. Hash verification, schema validation, and completeness are objective. Only routing efficiency requires judgment, and it's weighted low (10%).
+**Reward:** 5x normal contribution weight (one-time)
 
-### Ledger Pool (30% of emissions)
+### 2. Schema Updates
 
-Rewards maintenance of the **Subnet Ledger**:
+Detecting and proposing changes to existing subnet schemas.
 
-| Criterion | Weight | Measurement |
-|-----------|--------|-------------|
-| Schema freshness | 15% | Age of last schema update vs. subnet's actual state |
-| Coverage | 10% | Number of subnets accurately catalogued |
-| Trap performance | 5% | Success rate on validator schema traps |
+```json
+{
+  "proposal": {
+    "type": "schema_update",
+    "subnet_id": "SN22",
+    "changes": [
+      {"path": "output_schema.results.snippet", "old": "str", "new": "str | null"},
+      {"path": "input_schema.max_results.max", "old": 100, "new": 50}
+    ],
+    "evidence_hash": "0x..."
+  }
+}
+```
+
+**Reward:** Standard contribution weight
+
+### 3. Deprecation Detection
+
+Identifying subnets that are offline, unreliable, or deprecated.
+
+```json
+{
+  "proposal": {
+    "type": "deprecation",
+    "subnet_id": "SN87",
+    "reason": "offline",
+    "evidence": {
+      "probe_attempts": 10,
+      "success_rate": 0.0,
+      "last_success": "2026-01-15T..."
+    }
+  }
+}
+```
+
+**Reward:** Standard contribution weight
+
+### 4. Metrics Updates
+
+Updating latency, reliability, and cost figures.
+
+**Reward:** Reduced weight (easier to verify)
 
 ---
 
-## Scoring Formula
+## Ledger Governance
+
+The Ledger is a shared resource. Updates require validation.
+
+### Proposal → Verification → Commit
 
 ```
-S = (0.70 × S_coordination) + (0.30 × S_ledger)
-
-Where:
-  S_coordination = (0.25 × hash_verified) + (0.20 × schema_valid) + 
-                   (0.15 × completeness) + (0.10 × routing_score)
-  
-  S_ledger = (0.15 × freshness) + (0.10 × coverage) + (0.05 × trap_score)
+┌─────────────────────────────────────────────────────────────────┐
+│                  LEDGER UPDATE FLOW                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  MINER                 VALIDATORS              LEDGER            │
+│    │                       │                      │              │
+│    │── Propose update ────▶│                      │              │
+│    │                       │── Verify against ───▶│ (test call)  │
+│    │                       │   live subnet        │              │
+│    │                       │◀── Result ───────────│              │
+│    │                       │                      │              │
+│    │                       │── If valid: ────────▶│ Commit       │
+│    │                       │                      │              │
+│    │                       │── If invalid: ──────▶│ Reject       │
+│    │◀── Stake slashed ─────│                      │              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Hash Verification (25%)
+### Conflict Resolution
 
-Every subnet call must have a cryptographic proof:
+Multiple miners might propose the same update:
 
 ```python
-def verify_hash(call):
-    # Check that the hash corresponds to a real transaction
-    # on the target subnet's blockchain
-    tx = fetch_transaction(call.subnet, call.hash)
-    if tx is None:
-        return 0.0  # No proof = no credit
-    if tx.timestamp > challenge.issued_at + TIMEOUT:
-        return 0.0  # Call happened after challenge = gaming
-    return 1.0
-```
-
-**Binary:** Either all calls verify (1.0) or they don't (0.0). No partial credit for faked calls.
-
-### Schema Compliance (20%)
-
-Output must match the target schema exactly:
-
-```python
-def validate_schema(output, target_schema):
-    try:
-        PydanticModel(**output)
-        return 1.0
-    except ValidationError as e:
-        # Partial credit for minor issues
-        error_ratio = len(e.errors()) / total_fields
-        return max(0, 1.0 - error_ratio)
-```
-
-### Completeness (15%)
-
-Did the miner actually complete the task?
-
-```python
-def score_completeness(output, target_schema):
-    required_fields = get_required_fields(target_schema)
-    present_fields = count_present(output, required_fields)
-    return present_fields / len(required_fields)
-```
-
-### Routing Efficiency (10%)
-
-Was the subnet selection optimal? This is the one subjective component:
-
-| Scenario | Score |
-|----------|-------|
-| Optimal routing (best subnets for task) | 1.0 |
-| Acceptable routing (works but suboptimal) | 0.7 - 0.9 |
-| Wasteful routing (unnecessary calls) | 0.3 - 0.6 |
-| Failed routing (wrong subnets entirely) | 0.0 |
-
-Validators maintain reference decompositions for common task types. Novel tasks are scored more leniently.
-
-### Ledger Freshness (15%)
-
-How current is the miner's Subnet Ledger?
-
-```python
-def score_freshness(miner_ledger, live_state):
-    stale_entries = 0
-    for subnet in miner_ledger:
-        if miner_ledger[subnet].schema != live_state[subnet].schema:
-            stale_entries += 1
-    return 1.0 - (stale_entries / len(miner_ledger))
-```
-
-### Coverage (10%)
-
-How many subnets does the miner accurately track?
-
-```python
-def score_coverage(miner_ledger, active_subnets):
-    covered = len([s for s in active_subnets if s in miner_ledger])
-    return covered / len(active_subnets)
-```
-
-### Trap Performance (5%)
-
-Validators periodically issue challenges using subnets with known schema changes:
-
-```python
-def schema_trap(miner):
-    # Use a subnet that changed its schema yesterday
-    trap_subnet = get_recently_changed_subnet()
-    challenge = generate_challenge_requiring(trap_subnet)
-    response = miner.respond(challenge)
+def resolve_conflict(proposals):
+    # Sort by timestamp (first proposer wins)
+    sorted_proposals = sorted(proposals, key=lambda p: p.timestamp)
     
-    if response.ledger[trap_subnet].schema == old_schema:
-        return 0.0  # Stale ledger
-    return 1.0  # Current ledger
+    # Verify first proposal
+    if verify(sorted_proposals[0]):
+        # First miner gets full credit
+        credit(sorted_proposals[0].miner, weight=FULL_WEIGHT)
+        
+        # Others get reduced "confirmation" credit
+        for p in sorted_proposals[1:]:
+            if verify(p):
+                credit(p.miner, weight=CONFIRMATION_WEIGHT)
+    else:
+        # First proposal invalid, try next
+        resolve_conflict(sorted_proposals[1:])
+```
+
+### Anti-Spam
+
+Proposals cost a small stake:
+
+```python
+PROPOSAL_STAKE = 0.0001  # TAO
+
+def submit_proposal(miner, proposal):
+    # Lock stake
+    lock_stake(miner, PROPOSAL_STAKE)
+    
+    # Queue for verification
+    queue_proposal(proposal)
+    
+    # After verification:
+    if proposal.verified:
+        unlock_stake(miner)
+        # Miner's Ledger contribution score increases
+    else:
+        slash_stake(miner, PROPOSAL_STAKE * 0.5)
+        unlock_stake(miner, PROPOSAL_STAKE * 0.5)
+```
+
+False proposals lose half their stake.
+
+---
+
+## Scoring Formulas
+
+### Orchestration Score
+
+```
+S_orch = (0.20 × hash_verified) + 
+         (0.15 × schema_valid) + 
+         (0.10 × completeness) + 
+         (0.10 × routing_score) + 
+         (0.05 × latency_score)
+```
+
+All components are 0.0 to 1.0.
+
+### Ledger Score
+
+```
+S_ledger = (0.20 × update_accuracy) + 
+           (0.10 × discovery_score) + 
+           (0.05 × freshness_score) + 
+           (0.05 × coverage_score)
+```
+
+### Combined Score
+
+```
+S_total = S_orch + S_ledger
+
+# Normalized for weight setting
+W_miner = S_total / sum(all_miner_scores)
 ```
 
 ---
 
 ## Miner Economics
 
-### Revenue Sources
-
-| Source | Amount | Frequency |
-|--------|--------|-----------|
-| Emissions | ~0.015 TAO/challenge | Per successful challenge |
-| Margin share | ~0.002 TAO/challenge | Per organic (paid) request |
-
-### Cost Structure
+### Costs
 
 | Cost | Amount | Notes |
 |------|--------|-------|
-| Subnet calls | 0.002-0.005 TAO/call | Varies by subnet |
-| Compute | Minimal | Orchestration, not inference |
-| Ledger maintenance | Time | Polling metagraph |
+| Subnet calls | 0.005-0.015 TAO | Per orchestration job |
+| Proposal stake | 0.0001 TAO | Refunded if valid |
 
-### Profitability Example
+### Profitability
 
-**Scenario:** Miner handles 100 challenges/day, 70% success rate
+Depends on:
+- Orchestration success rate (higher = more emissions)
+- Ledger contribution accuracy (verified updates earn weight)
+- Subnet call costs (efficient routing = lower costs)
 
-| Line item | Calculation | Daily |
-|-----------|-------------|-------|
-| Emissions earned | 70 × 0.015 TAO | 1.05 TAO |
-| Margin share | 70 × 0.002 TAO | 0.14 TAO |
-| Subnet costs | 70 × 0.008 TAO | (0.56 TAO) |
-| Failed costs | 30 × 0.006 TAO | (0.18 TAO) |
-| **Net profit** | | **0.45 TAO/day** |
-
-**Break-even:** ~55% success rate (depends on subnet costs and emission rates)
+Break-even requires ~50% orchestration success rate.
 
 ---
 
 ## Anti-Gaming Mechanisms
 
-### Hash Auditing
+### Hash Fabrication
 
-**Attack:** Miner claims to call subnets but fabricates responses.
+**Attack:** Claim subnet calls without making them.
 
-**Defense:** Every call requires a verifiable on-chain transaction hash. Validators cross-reference hashes against subnet records. Fabricated hashes = immediate zero score + blacklist consideration.
+**Defense:** Validators cross-reference hashes against subnet transaction logs. Fabricated hashes = zero score + blacklist.
 
-### Schema Traps
+### Ledger Spam
 
-**Attack:** Miner maintains stale Ledger, hopes validators don't notice.
+**Attack:** Flood proposals to farm emissions.
 
-**Defense:** Validators track recent schema changes across the metagraph. Challenges periodically require subnets that changed recently. Stale miners fail these traps.
+**Defense:** Proposal stake + slash on invalid. Spam is economically irrational.
 
-```python
-# Validator maintains list of recent changes
-recent_changes = [
-    {"subnet": "SN22", "changed": "2026-02-07", "field": "output_schema"},
-    {"subnet": "SN13", "changed": "2026-02-06", "field": "input_schema"},
-]
+### Stale Copying
 
-# 20% of challenges include a recently-changed subnet
-if random() < 0.2:
-    trap_subnet = random.choice(recent_changes)
-    include_in_challenge(trap_subnet)
-```
+**Attack:** Copy other miners' Ledger updates.
 
-### Routing Replay
+**Defense:** Timestamp priority. First proposer gets full credit; copiers get nothing or confirmation bonus only.
 
-**Attack:** Miner always uses the same subnet routing regardless of task.
+### Collusion
 
-**Defense:** Validators issue diverse challenges. A miner who routes "find trending papers" the same as "analyze competitor pricing" is scored down on routing efficiency.
+**Attack:** Miners and validators collude to approve false updates.
 
-### Sybil Detection
+**Defense:** 
+- Multiple validators must agree
+- Random validators selected per proposal
+- External users can challenge entries (with stake)
 
-**Attack:** Run multiple miners with identical Ledgers to capture more emissions.
+### Orchestration Shortcuts
 
-**Defense:** Identical Ledger entries across UIDs trigger correlation analysis. Highly correlated miners see emission dilution.
+**Attack:** Skip synthesis, just concatenate subnet outputs.
+
+**Defense:** Schema compliance check. Raw concatenation won't match target schema structure.
 
 ---
 
-## Validator Incentive Alignment
+## Validator Incentives
+
+Validators earn by:
+1. Verifying orchestration hash proofs
+2. Testing Ledger proposals against live subnets
+3. Maintaining consensus on miner scores
 
 ### V-Trust Mechanics
 
-Validators earn based on consensus alignment:
-
 ```python
-def validator_reward(validator, epoch_scores):
+def update_v_trust(validator, epoch):
     consensus = stake_weighted_median(all_validator_scores)
     deviation = mean_absolute_error(validator.scores, consensus)
-    v_trust = 1.0 - (deviation * 2.0)  # Penalize outliers
-    return base_reward * max(0.5, v_trust)
+    
+    # Ledger verification accuracy
+    ledger_accuracy = validator.correct_verifications / validator.total_verifications
+    
+    # Combined trust score
+    v_trust = (0.7 * (1 - deviation)) + (0.3 * ledger_accuracy)
+    
+    return v_trust
 ```
 
-### Why This Works
-
-- **Honest validators converge** on similar scores (hash verification is deterministic, schema validation is deterministic)
-- **Dishonest validators deviate** and lose V-Trust
-- **Colluding validators** would need majority stake to shift consensus
+Low V-Trust = lower dividend share.
 
 ---
 
@@ -291,9 +386,10 @@ def validator_reward(validator, epoch_scores):
 
 | Event | Frequency |
 |-------|-----------|
-| Synthetic challenges | Every 20 blocks (~4 minutes) |
-| Organic traffic | Real-time as requests arrive |
-| Weight setting | Every 360 blocks (~1 hour) |
-| Ledger trap injection | 20% of challenges |
+| Orchestration challenges | Every 20 blocks (~4 min) |
+| Ledger proposal window | Rolling (any time) |
+| Ledger verification | Within 5 blocks of proposal |
+| Weight commitment | Every 360 blocks (~1 hr) |
+| Ledger snapshot (on-chain) | Every 100 blocks (~20 min) |
 
 ---
